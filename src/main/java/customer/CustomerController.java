@@ -2,8 +2,6 @@ package customer;
 
 
 import jakarta.servlet.http.HttpSession;
-import oracle.jdbc.proxy.annotation.Post;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,19 +22,19 @@ public class CustomerController {
         Customer customer=customerService.findCustomer(cno);
 
         if(customer==null) return "notfound"; // 못 찾으면 not found
-        String username=customer.getName();
-        session.setAttribute("cno",username);
+        String getCno=customer.getCno();
+        session.setAttribute("cno",getCno);
 
-        return username;
-    } // 로그인 하면 유저 아이디를 얻어올 수 있다. session-check을 앞으로 통해서만 아이디를 얻어오자.
+        return getCno;
+    } // 로그인 하면 유저 아이디를 얻어올 수 있다. session-check을 통해서만 아이디를 얻어오자.
     @PostMapping("main/register")
     private String register(@RequestParam Map<String,String> params) {
         CustomerSaveDto customerSaveDto=CustomerSaveDto.builder().cno(params.get("cno"))
                         .name(params.get("name"))
                         .passwd(params.get("passwd"))
                         .email(params.get("email")).build();
-        Customer customer=customerService.saveCustomer(customerSaveDto);
 
+        Customer customer=customerService.saveCustomer(customerSaveDto);
         return "Success: " + customer.getName();
     }
 

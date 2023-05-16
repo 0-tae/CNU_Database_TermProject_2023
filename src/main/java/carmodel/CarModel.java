@@ -25,4 +25,8 @@ public class CarModel {
 
     @Column(name = "NUMBEROFSEATS")
     private Integer numberOfSeats;
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
 }

@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Table(name = "RENTCAR")
 public class RentCar {
 
+
+
     @Id
     @Column(name = "LICENSEPLATENO")
     private String licensePlateNo;
@@ -18,14 +20,29 @@ public class RentCar {
     @Column(name = "DATEDUE")
     private LocalDateTime dateDue;
 
-    @Column(name = "DATEERETURNED")
-    private LocalDateTime dateReturned;
+    @Column(name = "DATEERENTED")
+    private LocalDateTime dateRented;
 
     @ManyToOne(targetEntity = CarModel.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "MODELNAME")
-    private CarModel modelName;
+    private CarModel carModel;
 
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
     private Customer cno;
+
+    public CarModel getCarModel() {
+        return carModel;
+    }
+
+    public LocalDateTime getDateDue() {
+        return dateDue;
+    }
+
+    public LocalDateTime getDateRented() {
+        return dateRented;
+    }
+    public String getLicensePlateNo() {
+        return licensePlateNo;
+    }
 }
