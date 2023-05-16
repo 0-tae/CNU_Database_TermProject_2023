@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReserveService {
@@ -26,6 +27,11 @@ public class ReserveService {
 
     public List<Reserve> findReserveAll(){
         return reserveRepository.findAll();
+    }
+    public List<Reserve> findReserveAllByCno(String cno){
+        return reserveRepository.findAll().stream().
+                filter(reserve->reserve.getCno().getCno().equals(cno)).
+                collect(Collectors.toList());
     }
 
 

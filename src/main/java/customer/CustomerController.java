@@ -29,17 +29,10 @@ public class CustomerController {
     } // 로그인 하면 유저 아이디를 얻어올 수 있다. session-check을 통해서만 아이디를 얻어오자.
     @PostMapping("main/register")
     private String register(@RequestParam Map<String,String> params) {
-        CustomerSaveDto customerSaveDto=CustomerSaveDto.builder().cno(params.get("cno"))
-                        .name(params.get("name"))
-                        .passwd(params.get("passwd"))
-                        .email(params.get("email")).build();
 
-        Customer customer=customerService.saveCustomer(customerSaveDto);
+
+        Customer customer=customerService.saveCustomer(params);
         return "Success: " + customer.getName();
     }
 
-    @PostMapping("main/session-check")
-    private String sessionCheck(HttpSession session){
-        return (String)session.getAttribute("cno");
-    } // session-check을 앞으로 통해서만 아이디를 얻어오자.
 }

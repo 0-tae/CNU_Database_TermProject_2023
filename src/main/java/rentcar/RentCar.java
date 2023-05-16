@@ -31,6 +31,18 @@ public class RentCar {
     @JoinColumn(name = "CNO")
     private Customer cno;
 
+    public void setDateDue(LocalDateTime dateDue) {
+        this.dateDue = dateDue;
+    }
+
+    public void setDateRented(LocalDateTime dateRented) {
+        this.dateRented = dateRented;
+    }
+
+    public void setCno(Customer cno) {
+        this.cno = cno;
+    }
+
     public CarModel getCarModel() {
         return carModel;
     }
@@ -44,5 +56,8 @@ public class RentCar {
     }
     public String getLicensePlateNo() {
         return licensePlateNo;
+    }
+    public Customer getCno() {
+        return cno;
     }
 }

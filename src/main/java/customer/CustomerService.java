@@ -4,6 +4,7 @@ package customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -18,7 +19,13 @@ public class CustomerService {
         return customerRepository.findById(username).orElse(null);
     }
 
-    public Customer saveCustomer(CustomerSaveDto customerSaveDto){
+    public Customer saveCustomer(Map<String,String> params){
+        CustomerSaveDto customerSaveDto=
+                        CustomerSaveDto.builder().cno(params.get("cno"))
+                        .name(params.get("name"))
+                        .passwd(params.get("passwd"))
+                        .email(params.get("email")).build();
+
         Customer customer=customerSaveDto.toEntity();
         return customerRepository.save(customer);
     }

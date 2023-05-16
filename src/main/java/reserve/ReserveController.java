@@ -23,6 +23,10 @@ public class ReserveController {
         return reserveService.findReserveByCno(cno);
     }
 
+    @GetMapping("reserve/realAll")
+    private List<Reserve> readAll(HttpSession session){ // load All by cno
+        return reserveService.findReserveAllByCno((String)session.getAttribute("cno"));
+    }
 
     @PostMapping("reserve/save")
     private Reserve save(@RequestBody ReserveDto reserveDto){
@@ -33,9 +37,9 @@ public class ReserveController {
 
     @PostMapping("reserve/cancel")
     private String cancel(String licensePLateNo){
-        if(!reserveService.cancelReserve(licensePLateNo)){
+        if(!reserveService.cancelReserve(licensePLateNo))
             return "cancel error : "+licensePLateNo;
-        }
-        return licensePLateNo+" is deleted";
+        else
+            return licensePLateNo+" is deleted";
     }
 }
