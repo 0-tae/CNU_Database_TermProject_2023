@@ -1,6 +1,5 @@
 package reserve;
 
-import carmodel.CarModel;
 import customer.Customer;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -16,7 +15,7 @@ public class Reserve {
         this.startDate = startDate;
         this.reserveDate = reserveDate;
         this.endDate = endDate;
-        this.cno = cno;
+        this.customer = cno;
     }
 
     public Reserve() {}
@@ -37,7 +36,7 @@ public class Reserve {
 
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
-    private Customer cno;
+    private Customer customer;
 
     public String getLicensePlateNo() {
         return licensePlateNo;
@@ -51,8 +50,8 @@ public class Reserve {
         return endDate;
     }
 
-    public Customer getCno() {
-        return cno;
+    public Customer getCustomer() {
+        return customer;
     }
 }
 

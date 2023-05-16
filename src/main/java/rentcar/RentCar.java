@@ -3,7 +3,6 @@ package rentcar;
 import carmodel.CarModel;
 import customer.Customer;
 import jakarta.persistence.*;
-import previousrental.PreviousRentalPK;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +28,7 @@ public class RentCar {
 
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
-    private Customer cno;
+    private Customer customer;
 
     public void setDateDue(LocalDateTime dateDue) {
         this.dateDue = dateDue;
@@ -39,8 +38,8 @@ public class RentCar {
         this.dateRented = dateRented;
     }
 
-    public void setCno(Customer cno) {
-        this.cno = cno;
+    public void setCustomer(Customer cno) {
+        this.customer = cno;
     }
 
     public CarModel getCarModel() {
@@ -57,7 +56,7 @@ public class RentCar {
     public String getLicensePlateNo() {
         return licensePlateNo;
     }
-    public Customer getCno() {
-        return cno;
+    public Customer getCustomer() {
+        return customer;
     }
 }

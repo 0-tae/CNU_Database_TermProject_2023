@@ -1,9 +1,8 @@
 package previousrental;
 
-import carmodel.CarModel;
 import customer.Customer;
 import jakarta.persistence.*;
-import rentcar.RentCar;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +24,23 @@ public class PreviousRental {
 
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
-    private Customer cno;
+    private Customer customer;
+
+    @Builder
+    public PreviousRental(String licensePlateNo, LocalDateTime dateRented, LocalDateTime dateReturned, Integer payment, Customer customer) {
+        this.licensePlateNo = licensePlateNo;
+        this.dateRented = dateRented;
+        this.dateReturned = dateReturned;
+        this.payment = payment;
+        this.customer = customer;
+    }
+
+    public LocalDateTime getDateRented() {
+        return dateRented;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
 }
 

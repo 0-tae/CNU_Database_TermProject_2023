@@ -3,11 +3,13 @@ package rentcar;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import previousrental.PreviousRental;
+import previousrental.PreviousRentalDto;
+import previousrental.PreviousRentalService;
 import reserve.Reserve;
 import reserve.ReserveService;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,14 +18,14 @@ public class RentCarService {
 
     private final RentCarRepository rentCarRepository;
     private final ReserveService reserveService;
-    private final PreviousRental previousRental;
+    private final PreviousRentalService previousRentalService;
     private final EntityManager entityManager;
 
 
-    public RentCarService(RentCarRepository rentCarRepository, ReserveService reserveService, PreviousRental previousRental, EntityManager entityManager) {
+    public RentCarService(RentCarRepository rentCarRepository, ReserveService reserveService, PreviousRentalService previousRentalService, EntityManager entityManager) {
         this.rentCarRepository = rentCarRepository;
         this.reserveService = reserveService;
-        this.previousRental = previousRental;
+        this.previousRentalService = previousRentalService;
         this.entityManager = entityManager;
     }
 
@@ -58,7 +60,7 @@ public class RentCarService {
 
     public List<RentCar> findRentCarsAllByCno(String cno){
         return rentCarRepository.findAll().stream().
-                filter(car->car.getCno().getCno().equals(cno)).
+                filter(car->car.getCustomer().getCno().equals(cno)).
                 collect(Collectors.toList());
     }
 
@@ -70,14 +72,28 @@ public class RentCarService {
                 existRental.getDateDue().isBefore(inputDateTime);
     }
 
+    public PreviousRentalDto createPreviousRentalData(RentCar rentCar){
+        LocalDateTime returnDate=LocalDateTime.now();
+        int perDay=(int)rentCar.getDateRented().until(returnDate, ChronoUnit.DAYS);
+        int payment=rentCar.getCarModel().getRentRatePerDay()*perDay;
 
+        return PreviousRentalDto.builder().
+                licensePlateNo(rentCar.getLicensePlateNo()).
+                dateRented(rentCar.getDateRented()).
+                customer(rentCar.getCustomer()).
+                dateReturned(returnDate).
+                payment(perDay*payment).build();
+    }
     @Transactional
     public boolean carReturn(String givenLicensePlateNum){
         RentCar rentCar = entityManager.find(RentCar.class, givenLicensePlateNum);
+
         if(rentCar==null) return false;
 
-        // 아래 작업 이전에 Previous Rental에 데이터 넣는 과정 필요!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        rentCar.setCno(null);
+        previousRentalService.save(createPreviousRentalData(rentCar));
+        // 렌트카 정보 초기화 이전에 이전 대여정보를 생성
+
+        rentCar.setCustomer(null);
         rentCar.setDateRented(null);
         rentCar.setDateDue(null);
         RentCar modified = entityManager.merge(rentCar);

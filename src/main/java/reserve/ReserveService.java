@@ -30,7 +30,7 @@ public class ReserveService {
     }
     public List<Reserve> findReserveAllByCno(String cno){
         return reserveRepository.findAll().stream().
-                filter(reserve->reserve.getCno().getCno().equals(cno)).
+                filter(reserve->reserve.getCustomer().getCno().equals(cno)).
                 collect(Collectors.toList());
     }
 

@@ -29,4 +29,7 @@ public class CarModel {
     public String getVehicleType() {
         return vehicleType;
     }
+    public Integer getRentRatePerDay() {
+        return rentRatePerDay;
+    }
 }
