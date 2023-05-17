@@ -6,11 +6,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Table(name = "CUSTOMER")
 @Entity
-@Data
+@Getter
+@NoArgsConstructor
 public class Customer {
 
     @Builder
@@ -20,8 +23,6 @@ public class Customer {
         this.passwd = passwd;
         this.email = email;
     }
-
-    public Customer(){}
 
     @Id
     @Column(name = "CNO")

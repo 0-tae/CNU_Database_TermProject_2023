@@ -4,10 +4,13 @@ import customer.Customer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+
+@Getter
 public class PreviousRentalDto {
     private String licensePlateNo;
     private LocalDateTime dateRented;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,11 +18,11 @@ public class ReserveController {
     public ReserveController(ReserveService reserveService) {
         this.reserveService = reserveService;
     }
-
-    @GetMapping("reserve/read")
-    private Reserve read(String cno){
-        return reserveService.findReserveByCno(cno);
-    }
+//
+//    @GetMapping("reserve/read")
+//    private Reserve read(String cno){
+//        return reserveService.findReserveByCno(cno);
+//    }
 
     @GetMapping("reserve/realAll")
     private List<Reserve> readAll(HttpSession session){ // load All by cno
@@ -36,10 +37,11 @@ public class ReserveController {
     // 예약이 완료되면 반환 json으로 프론트에 reserve 뷰 테이블 생성
 
     @PostMapping("reserve/cancel")
-    private String cancel(String licensePLateNo){
-        if(!reserveService.cancelReserve(licensePLateNo))
-            return "cancel error : "+licensePLateNo;
+    private String cancel(@RequestBody ReserveDto reserveDto){
+
+        if(!reserveService.cancelReserve(reserveDto.getLicensePlateNo(),reserveDto.getStartDate()))
+            return "cancel error : "+reserveDto.getLicensePlateNo();
         else
-            return licensePLateNo+" is deleted";
+            return reserveDto.getLicensePlateNo()+" is deleted";
     }
 }

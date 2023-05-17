@@ -3,9 +3,12 @@ package customer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.catalina.util.CustomObjectInputStream;
 
-
+@Getter
+@NoArgsConstructor
 public class CustomerSaveDto {
     private String cno;
     private String name;
@@ -19,8 +22,6 @@ public class CustomerSaveDto {
         this.passwd = passwd;
         this.email = email;
     }
-
-    public CustomerSaveDto(){}
 
     public Customer toEntity(){
         return Customer.builder().cno(cno)

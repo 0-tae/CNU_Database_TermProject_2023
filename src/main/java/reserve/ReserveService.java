@@ -2,6 +2,7 @@ package reserve;
 
 import customer.CustomerService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,12 +18,8 @@ public class ReserveService {
         this.customerService = customerService;
     }
 
-    public Reserve findReserveByCno(String cno){
-        return reserveRepository.findById(cno).orElse(null);
-    }
-
-    public Reserve findReserveByLicence(String licensePlateNo){
-        return reserveRepository.findById(licensePlateNo).orElse(null);
+    public Reserve findReserveByLicence(String licensePlateNo,LocalDateTime startDate){
+        return reserveRepository.findById(new ReservePK(licensePlateNo,startDate)).orElse(null);
     }
 
     public List<Reserve> findReserveAll(){
@@ -45,9 +42,9 @@ public class ReserveService {
     }
 
 
-    public boolean cancelReserve(String licensePLateNo){
+    public boolean cancelReserve(String licensePLateNo, LocalDateTime dateTime){
         try{
-            reserveRepository.deleteById(licensePLateNo);
+            reserveRepository.deleteById(new ReservePK(licensePLateNo, dateTime));
             return true;
         }catch (Exception e){
             return false;

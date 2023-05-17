@@ -3,11 +3,15 @@ package reserve;
 import customer.Customer;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVE")
+@Getter
+@NoArgsConstructor
 public class Reserve {
     @Builder
     public Reserve(String licensePlateNo, LocalDateTime startDate, LocalDateTime reserveDate, LocalDateTime endDate, Customer cno) {
@@ -17,8 +21,6 @@ public class Reserve {
         this.endDate = endDate;
         this.customer = cno;
     }
-
-    public Reserve() {}
 
     @Id
     @Column(name = "LICENSEPLATENO")
@@ -37,21 +39,5 @@ public class Reserve {
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
     private Customer customer;
-
-    public String getLicensePlateNo() {
-        return licensePlateNo;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
 }
 

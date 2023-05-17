@@ -14,9 +14,9 @@ public class PreviousRentalController {
     }
 
     @GetMapping("previous/readAll")
-    public List<PreviousRental> readAll(@RequestParam String cno){ // 이전 대여 내역 출력(고객 기준)
-        List<PreviousRental> rentalList=previousRentalService.findAllByCno(cno);
-        rentalList.sort((o1, o2) -> o1.getDateRented().compareTo(o2.getDateRented()));
-        return rentalList;
+    public List<ResponseDtoForPreviousRental> readAll(@RequestParam String cno){ // 이전 대여 내역 출력(고객 기준)
+        List<ResponseDtoForPreviousRental> response=previousRentalService.convertPreviousRentalToDto(cno);
+        response.sort((o1, o2) -> o1.getDateRented().compareTo(o2.getDateRented()));
+        return response;
     }
 }

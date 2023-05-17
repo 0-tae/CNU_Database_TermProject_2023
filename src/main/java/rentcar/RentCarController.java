@@ -5,7 +5,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class RentCarController {
@@ -16,8 +18,20 @@ public class RentCarController {
     }
 
     @GetMapping("rent/readAll")
-    private List<RentCar> readAll(HttpSession session){ // load All by cno
-        return rentCarService.findRentCarsAllByCno((String)session.getAttribute("cno"));
+    private List<ResponseDtoForRentCar> readAll(HttpSession session){ // 대여내역 검색
+        List<RentCar> rentalList = rentCarService.findRentCarsAllByCno((String) session.getAttribute("cno"));
+        List<ResponseDtoForRentCar> responses=
+                rentalList.stream().map(rentcar -> ResponseDtoForRentCar.builder()
+                                .licensePlateNum(rentcar.getLicensePlateNo())
+                                .modelName(rentcar.getCarModel().getModelName())
+                                .dateRented(rentcar.getDateRented())
+                                .dateDue(rentcar.getDateDue())
+                                .payment(rentCarService.paymentCalculation
+                                        (rentcar,(int)rentcar.getDateRented().until(rentcar.getDateDue(), ChronoUnit.DAYS)))
+                                .build()).toList();
+
+        responses.sort((o1, o2) -> o1.getDateRented().compareTo(o2.getDateRented()));
+        return responses;
     }
 
     @GetMapping("rent/search")

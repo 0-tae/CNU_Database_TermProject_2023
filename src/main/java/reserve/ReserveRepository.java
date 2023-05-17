@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import rentcar.RentCar;
 
 @Repository
-public interface ReserveRepository extends JpaRepository<Reserve,String> {
+public interface ReserveRepository extends JpaRepository<Reserve,ReservePK> {
 
 }

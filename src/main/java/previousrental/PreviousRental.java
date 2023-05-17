@@ -3,10 +3,17 @@ package previousrental;
 import customer.Customer;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 
+
+@Table(name ="PREVIOUSRENTAL")
+@Entity
+@Getter
+@NoArgsConstructor
 public class PreviousRental {
     @Id
     @Column(name = "LICENSEPLATENO")
@@ -22,6 +29,7 @@ public class PreviousRental {
     @Column(name = "PAYMENT")
     private Integer payment;
 
+
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.LAZY) // 헷갈려
     @JoinColumn(name = "CNO")
     private Customer customer;
@@ -33,14 +41,6 @@ public class PreviousRental {
         this.dateReturned = dateReturned;
         this.payment = payment;
         this.customer = customer;
-    }
-
-    public LocalDateTime getDateRented() {
-        return dateRented;
-    }
-
-    public Customer getCustomer() {
-        return customer;
     }
 }
 

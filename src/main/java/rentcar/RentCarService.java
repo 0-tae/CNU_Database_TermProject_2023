@@ -34,7 +34,7 @@ public class RentCarService {
         List<RentCar> filteredList;
 
         filteredList=availableList.stream().filter(rentCar->{
-            Reserve reserve=reserveService.findReserveByLicence(rentCar.getLicensePlateNo());
+            Reserve reserve=reserveService.findReserveByLicence(rentCar.getLicensePlateNo(),rentCar.getDateRented());
             return reserve==null || !(reserveService.isReserveTimeConflict(reserve,searchDto.startDate)
                     && reserveService.isReserveTimeConflict(reserve,searchDto.endDate));
         }).collect(Collectors.toList());
@@ -60,8 +60,7 @@ public class RentCarService {
 
     public List<RentCar> findRentCarsAllByCno(String cno){
         return rentCarRepository.findAll().stream().
-                filter(car->car.getCustomer().getCno().equals(cno)).
-                collect(Collectors.toList());
+                filter(car->car.getCustomer().getCno().equals(cno)).toList();
     }
 
     private boolean isRentalTimeConflict(RentCar existRental, LocalDateTime inputDateTime){
@@ -72,10 +71,13 @@ public class RentCarService {
                 existRental.getDateDue().isBefore(inputDateTime);
     }
 
+    public int paymentCalculation(RentCar rentCar, int totalDay){
+        return rentCar.getCarModel().getRentRatePerDay()*totalDay;
+    }
     public PreviousRentalDto createPreviousRentalData(RentCar rentCar){
         LocalDateTime returnDate=LocalDateTime.now();
         int perDay=(int)rentCar.getDateRented().until(returnDate, ChronoUnit.DAYS);
-        int payment=rentCar.getCarModel().getRentRatePerDay()*perDay;
+        int payment=paymentCalculation(rentCar,perDay);
 
         return PreviousRentalDto.builder().
                 licensePlateNo(rentCar.getLicensePlateNo()).

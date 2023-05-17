@@ -2,9 +2,12 @@ package reserve;
 
 import customer.Customer;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+
+@Getter
 public class ReserveDto {
     private String licensePlateNo;
     private LocalDateTime startDate;
@@ -25,9 +28,5 @@ public class ReserveDto {
                 endDate(endDate).
                 reserveDate(LocalDateTime.now()).
                 cno(cno).build();
-    }
-
-    public String getCno() {
-        return cno;
     }
 }

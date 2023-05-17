@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "RENTCAR")
 public class RentCar {
 
-
-
     @Id
     @Column(name = "LICENSEPLATENO")
     private String licensePlateNo;
