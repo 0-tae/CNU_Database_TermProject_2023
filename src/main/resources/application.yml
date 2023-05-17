@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XE
+    username: D202004189_TERM
+    password: "dydrkfl#7!"
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    database: oracle
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        query.in_clause_parameter_padding: true
+  web:
+    resources:
+      static-locations: classpath:/static/
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: choiyt3465@gmail.com
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+server:
+  port: 8080

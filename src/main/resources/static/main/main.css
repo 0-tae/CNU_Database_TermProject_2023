@@ -1,0 +1,126 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+#TopOfBox {
+    border: 1px solid black;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+#BottomOfBox {
+    min-width: 50px;
+}
+
+#BottomOfBox_Schedule {
+    height: 600px;
+}
+
+#popup_background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+#popup_window {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#popup_box {
+    position: absolute;
+    top:30%;
+    left:45%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
+    margin: 100px;
+    padding: 20px;
+    width: 500px;
+    height: 200px;
+}
+
+
+#Button_Add {
+    float: right;
+    display: inline;
+    margin-top: 35px;
+}
+
+#DropDown_Select {
+    float: right;
+    display: inline;
+    margin-top: 40px;
+    margin-left: 5px;
+}
+
+#button_x{
+    display: inline;
+    float: right;
+    cursor: pointer;
+    color: black;
+}
+.Table_ListLine {
+    border: 1px solid;
+}
+.Table_ListScheduleNode {
+    border-radius: 8px;
+    border:2px solid;
+    padding: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+.hidableClass {
+    display: none;
+}
+
+.ColorValue_0 {
+    background-color: red;
+}
+.ColorValue_1 {
+    background-color: green;
+}
+.ColorValue_2 {
+    background-color: yellow;
+}
+.popupContentBox {
+    position: absolute;
+    top:30%;
+    left:45%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.3);
+    margin: 100px;
+    padding: 20px;
+    width: 500px;
+    height: 200px;
+}
+
+td {
+    vertical-align: top;
+}
+
+tr,
+th {
+    border: 1px solid;
+}
+li {
+    text-align: center;
+}
+h1 {
+    display: inline-block;
+}
+
+table {
+    width: 100%;
+    border: 1px solid black;
+    border-collapse: collapse;
+    table-layout: fixed;
+}

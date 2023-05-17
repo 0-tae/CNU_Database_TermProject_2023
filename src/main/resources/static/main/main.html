@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+            href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/main/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="/main/main.js" defer></script>
+    <title>미니 렌터카 서비스</title>
+</head>
+<body>
+<h2 style="color: blue">로그인</h2>
+<div id="zone_login">
+    아이디 : <input id="cno"> <br>
+    비밀번호 : <input type="password" id="passwd"> <br><br>
+    <button id="button_login">로그인
+        <button id="button_register">회원가입 하기</button>
+</div>
+
+
+<div id="popup_background" class="hidableClass">
+    <div id="popup_window">
+        <div class="popupContentBox">
+            <form action="/main/register" method="post">
+                아이디 : <input name="cno" required> <br>
+                비밀번호 : <input password="passwd" required> <br>
+                이름 : <input name="name" required> <br>
+                이메일 : <input name="email" required> <br>
+                <input type="submit" id="button_register_request">
+                <button type="button" id="button_cancle">취소</button>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<h2 style="color: blue">렌터카 검색하기</h2>
+필터 : <select id="select_car">
+    <option value="entire">전체</option>
+    <option value="electric">전기차</option>
+    <option value="small">소형</option>
+    <option value="big">대형</option>
+    <option value="suv">SUV</option>
+    <option value="hop">승합</option>
+</select>
+<br>
+대여 시작일 : <input type="date" id="date_rentStart">
+<br>
+대여 종료일 : <input type="date" id="date_rentEnd">
+<br><br>
+<div id="box_printZone">print</div>
+
+<h2 style="color: blue">렌터카 예약목록</h2>
+<div id="box_reserveZone"></div>
+<h2 style="color: blue">대여중인 렌터카 확인 / 반납하기</h2>
+<div id="box_returnZone"></div>
+<h2 style="color: blue">이전에 대여한 렌터카 검색하기</h2>
+<div id="box_previousRentZone"></div>
+<h2>렌터카 통계정보 보기</h2>
+<div id="box_tmiZone"></div>
+
+
+<h2 style="color: blue">파랑색 글씨는 백엔드 완료</h1>
+</body>
+</html>
