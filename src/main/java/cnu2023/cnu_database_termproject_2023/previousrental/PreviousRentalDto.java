@@ -5,20 +5,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 @Getter
 @ToString
 public class PreviousRentalDto {
     private String licensePlateNo;
-    private LocalDateTime dateRented;
-    private LocalDateTime dateReturned;
+    private LocalDate dateRented;
+    private LocalDate dateReturned;
     private Integer payment;
     private Customer customer;
 
     @Builder
-    public PreviousRentalDto(String licensePlateNo, LocalDateTime dateRented, LocalDateTime dateReturned, Integer payment, Customer customer) {
+    public PreviousRentalDto(String licensePlateNo, LocalDate dateRented, LocalDate dateReturned, Integer payment, Customer customer) {
         this.licensePlateNo = licensePlateNo;
         this.dateRented = dateRented;
         this.dateReturned = dateReturned;

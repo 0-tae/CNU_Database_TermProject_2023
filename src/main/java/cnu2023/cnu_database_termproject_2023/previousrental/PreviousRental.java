@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 
@@ -24,10 +24,10 @@ public class PreviousRental {
 
     @Id
     @Column(name = "DATERENTED")
-    private LocalDateTime dateRented;
+    private LocalDate dateRented;
 
     @Column(name = "DATERETURNED")
-    private LocalDateTime dateReturned;
+    private LocalDate dateReturned;
 
     @Column(name = "PAYMENT")
     private Integer payment;
@@ -38,7 +38,7 @@ public class PreviousRental {
     private Customer customer;
 
     @Builder
-    public PreviousRental(String licensePlateNo, LocalDateTime dateRented, LocalDateTime dateReturned, Integer payment, Customer customer) {
+    public PreviousRental(String licensePlateNo, LocalDate dateRented, LocalDate dateReturned, Integer payment, Customer customer) {
         this.licensePlateNo = licensePlateNo;
         this.dateRented = dateRented;
         this.dateReturned = dateReturned;

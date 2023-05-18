@@ -3,7 +3,7 @@ spring:
     url: jdbc:oracle:thin:@localhost:1521/XE
     username: D202004189_TERM
     password: "dydrkfl#7!"
-    driver-class-name: oracle.jdbc.driver.OracleDriver
+    driver-class-name: oracle.jdbc.OracleDriver
   jpa:
     generate-ddl: true
     hibernate:

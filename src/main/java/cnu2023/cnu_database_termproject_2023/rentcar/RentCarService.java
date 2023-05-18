@@ -8,7 +8,7 @@ import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class RentCarService {
         List<RentCar> filteredList;
 
         filteredList=entierList.stream().filter(rentCar->
-                rentCar.getCarModel().getVehicleType().equals(searchDto.vehicleType)
+                searchDto.vehicleType.equals("entire") || rentCar.getCarModel().getVehicleType().equals(searchDto.vehicleType)
                 &&!(isRentalTimeConflict(rentCar,searchDto.startDate) && isRentalTimeConflict(rentCar,searchDto.endDate)))
                 .collect(Collectors.toList());
 
@@ -63,7 +63,7 @@ public class RentCarService {
                 filter(car->car.getCustomer().getCno().equals(cno)).toList();
     }
 
-    private boolean isRentalTimeConflict(RentCar existRental, LocalDateTime inputDateTime){
+    private boolean isRentalTimeConflict(RentCar existRental, LocalDate inputDateTime){
         if(existRental.getDateRented()==null || existRental.getDateDue()==null)
             return false; // 대여중이지 않은 것
 
@@ -75,7 +75,7 @@ public class RentCarService {
         return rentCar.getCarModel().getRentRatePerDay()*totalDay;
     }
     public PreviousRentalDto createPreviousRentalData(RentCar rentCar){
-        LocalDateTime returnDate=LocalDateTime.now();
+        LocalDate returnDate=LocalDate.now();
         int perDay=(int)rentCar.getDateRented().until(returnDate, ChronoUnit.DAYS);
         int payment=paymentCalculation(rentCar,perDay);
 

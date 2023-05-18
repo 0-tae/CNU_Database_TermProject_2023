@@ -3,7 +3,7 @@ package cnu2023.cnu_database_termproject_2023.previousrental;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 @Getter
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PreviousRentalPK implements Serializable {
     private String licensePlateNo;
-    private LocalDateTime dateRented;
+    private LocalDate dateRented;
 
     @Override
     public int hashCode() {

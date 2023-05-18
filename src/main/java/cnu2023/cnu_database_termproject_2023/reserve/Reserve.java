@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "RESERVE")
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @ToString
 public class Reserve {
     @Builder
-    public Reserve(String licensePlateNo, LocalDateTime startDate, LocalDateTime reserveDate, LocalDateTime endDate, Customer cno) {
+    public Reserve(String licensePlateNo, LocalDate startDate, LocalDate reserveDate, LocalDate endDate, Customer cno) {
         this.licensePlateNo = licensePlateNo;
         this.startDate = startDate;
         this.reserveDate = reserveDate;
@@ -32,13 +32,13 @@ public class Reserve {
 
     @Id
     @Column(name = "STARTDATE")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "RESERVEDATE")
-    private LocalDateTime reserveDate;
+    private LocalDate reserveDate;
 
     @Column(name = "ENDDATE")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @ManyToOne(targetEntity = Customer.class, fetch = FetchType.EAGER) // 헷갈려
     @JoinColumn(name = "CNO")

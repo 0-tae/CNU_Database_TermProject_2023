@@ -3,7 +3,7 @@ package cnu2023.cnu_database_termproject_2023.reserve;
 import cnu2023.cnu_database_termproject_2023.customer.CustomerService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +17,7 @@ public class ReserveService {
         this.customerService = customerService;
     }
 
-    public Reserve findReserveByLicence(String licensePlateNo,LocalDateTime startDate){
+    public Reserve findReserveByLicence(String licensePlateNo,LocalDate startDate){
         return reserveRepository.findById(new ReservePK(licensePlateNo,startDate)).orElse(null);
     }
 
@@ -31,7 +31,7 @@ public class ReserveService {
 
 
 
-    public boolean isReserveTimeConflict(Reserve existReservation,LocalDateTime inputDateTime){
+    public boolean isReserveTimeConflict(Reserve existReservation,LocalDate inputDateTime){
         if(existReservation.getStartDate()==null || existReservation.getEndDate()==null)
             return false;
 
@@ -40,7 +40,7 @@ public class ReserveService {
     }
 
 
-    public boolean cancelReserve(String licensePLateNo, LocalDateTime dateTime){
+    public boolean cancelReserve(String licensePLateNo, LocalDate dateTime){
         try{
             reserveRepository.deleteById(new ReservePK(licensePLateNo, dateTime));
             return true;

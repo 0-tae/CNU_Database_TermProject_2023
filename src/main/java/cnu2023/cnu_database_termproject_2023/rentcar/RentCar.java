@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "RENTCAR")
@@ -20,10 +20,10 @@ public class RentCar {
     private String licensePlateNo;
 
     @Column(name = "DATEDUE")
-    private LocalDateTime dateDue;
+    private LocalDate dateDue;
 
     @Column(name = "DATERENTED")
-    private LocalDateTime dateRented;
+    private LocalDate dateRented;
 
     @ManyToOne(targetEntity = CarModel.class, fetch = FetchType.EAGER) // 헷갈려
     @JoinColumn(name = "MODELNAME")

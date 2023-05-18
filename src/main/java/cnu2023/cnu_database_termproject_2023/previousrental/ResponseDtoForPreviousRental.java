@@ -3,17 +3,17 @@ package cnu2023.cnu_database_termproject_2023.previousrental;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 public class ResponseDtoForPreviousRental {
     String modelName;
     String licensePlateNum;
-    LocalDateTime dateRented;
-    LocalDateTime dateReturned;
+    LocalDate dateRented;
+    LocalDate dateReturned;
     Integer payment;
     @Builder
-    public ResponseDtoForPreviousRental(String modelName, String licensePlateNum, LocalDateTime dateRented, LocalDateTime dateReturned, Integer payment) {
+    public ResponseDtoForPreviousRental(String modelName, String licensePlateNum, LocalDate dateRented, LocalDate dateReturned, Integer payment) {
         this.modelName = modelName;
         this.licensePlateNum = licensePlateNum;
         this.dateRented = dateRented;

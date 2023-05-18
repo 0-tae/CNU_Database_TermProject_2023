@@ -7,14 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReservePK implements Serializable {
     private String licensePlateNo;
-    private LocalDateTime startDate;
+    private LocalDate startDate;
     @Override
     public int hashCode() {
         return licensePlateNo.hashCode()* startDate.getMonthValue()* startDate.getDayOfMonth();
