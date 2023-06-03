@@ -1,24 +1,31 @@
 package cnu2023.cnu_database_termproject_2023.reserve;
 
+import cnu2023.cnu_database_termproject_2023.customer.Customer;
 import cnu2023.cnu_database_termproject_2023.customer.CustomerService;
+import cnu2023.cnu_database_termproject_2023.rentcar.RentCar;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReserveService {
     private final ReserveRepository reserveRepository;
     private final CustomerService customerService;
 
-    public ReserveService(ReserveRepository reserveRepository, CustomerService customerService) {
+    private final EntityManager entityManager;
+
+    public ReserveService(ReserveRepository reserveRepository, CustomerService customerService, EntityManager entityManager) {
         this.reserveRepository = reserveRepository;
         this.customerService = customerService;
+        this.entityManager = entityManager;
     }
 
     public Reserve findReserveByLicence(String licensePlateNo,LocalDate startDate){
-        return reserveRepository.findById(new ReservePK(licensePlateNo,startDate)).orElse(null);
+        RentCar rentCar=entityManager.find(RentCar.class,licensePlateNo);
+        return reserveRepository.findById(new ReservePK(rentCar,startDate)).orElse(null);
     }
 
     public List<Reserve> findReserveAll(){
@@ -26,7 +33,8 @@ public class ReserveService {
     }
     public List<Reserve> findReserveAllByCno(String cno){
         return findReserveAll().stream().
-                filter(reserve->reserve.getCustomer().getCno().equals(cno)).toList();
+                filter(reserve->reserve.getCustomer().getCno().equals(cno)).
+                toList();
     }
 
 
@@ -35,14 +43,19 @@ public class ReserveService {
         if(existReservation.getStartDate()==null || existReservation.getEndDate()==null)
             return false;
 
-        return existReservation.getStartDate().isAfter(inputDateTime) &&
-                existReservation.getEndDate().isBefore(inputDateTime);
+        return (existReservation.getStartDate().isAfter(inputDateTime) &&
+                existReservation.getEndDate().isBefore(inputDateTime))||
+                (existReservation.getStartDate().isEqual(inputDateTime)
+                || existReservation.getEndDate().isEqual(inputDateTime));
     }
 
 
     public boolean cancelReserve(String licensePLateNo, LocalDate dateTime){
         try{
-            reserveRepository.deleteById(new ReservePK(licensePLateNo, dateTime));
+            String license=licensePLateNo.split("/")[0];
+            RentCar rentCar=entityManager.find(RentCar.class,license);
+
+            reserveRepository.deleteById(new ReservePK(rentCar, dateTime));
             return true;
         }catch (Exception e){
             return false;
@@ -50,7 +63,10 @@ public class ReserveService {
     }
 
     public Reserve saveReserve(ReserveDto dto){
-        Reserve reserve=dto.toEntity(customerService.findCustomer(dto.getCno()));
+        RentCar rentCar=entityManager.find(RentCar.class,dto.getLicensePlateNo());
+        Customer customer=customerService.findCustomer(dto.getCno());
+        Reserve reserve=dto.toEntity(rentCar,customer);
+
         return reserveRepository.save(reserve);
     }
 

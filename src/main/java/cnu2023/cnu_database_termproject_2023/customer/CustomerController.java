@@ -4,6 +4,7 @@ package cnu2023.cnu_database_termproject_2023.customer;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -36,8 +37,9 @@ public class CustomerController {
     }
 
     @PostMapping("session_check") // 검증완료
-    private String session_check(HttpSession session){
-        return "session: "+session.getAttribute("cno")+", "+session.getId();
+    private CustomerSessionDto session_check(HttpSession session){
+        return  CustomerSessionDto.builder().
+                cno((String)session.getAttribute("cno")).
+                sessionId(session.getId()).build();
     }
-
 }

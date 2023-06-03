@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Getter
 @ToString
-
 public class CustomerDto {
     String cno;
     String passwd;

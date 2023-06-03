@@ -12,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Getter
 @NoArgsConstructor
 @ToString
-
 public class Customer {
 
     @Builder

@@ -3,8 +3,10 @@ package cnu2023.cnu_database_termproject_2023.rentcar;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -18,28 +20,42 @@ public class RentCarController {
     }
 
     @GetMapping("/rent/readAll") // 검증완료
-    private List<ResponseDtoForRentCar> readAll(HttpSession session){ // 대여내역 검색
+    private List<ResponseDtoForRentalInfo> readAll(HttpSession session){ // 대여내역 검색
         List<RentCar> rentalList = rentCarService.findRentCarsAllByCno((String) session.getAttribute("cno"));
 
-        return  rentalList.stream().map(rentcar -> ResponseDtoForRentCar.builder()
-                .licensePlateNum(rentcar.getLicensePlateNo())
+        return  rentalList.stream().map(rentcar -> ResponseDtoForRentalInfo.builder()
+                .licensePlateNo(rentcar.getLicensePlateNo())
                 .modelName(rentcar.getCarModel().getModelName())
                 .dateRented(rentcar.getDateRented())
                 .dateDue(rentcar.getDateDue())
-                .payment(rentCarService.paymentCalculation
+                .expectedPayment(rentCarService.paymentCalculation
                         (rentcar,(int)rentcar.getDateRented().until(rentcar.getDateDue(), ChronoUnit.DAYS)))
                 .build()).sorted((o1, o2) -> o1.getDateRented().compareTo(o2.getDateRented())).toList();
     }
 
+    @PostMapping("/rent/save")
+    @Scheduled(cron = "0 0 0 * * *")
+    private void rent(HttpSession session){
+        rentCarService.saveAll((String) session.getAttribute("cno"));
+    }
+
     @GetMapping("/rent/search")
-    private List<RentCar> search(@RequestBody SearchDto searchDto){ // 필터, 대여기간 설정 후 검색
-        return rentCarService.searchFullFilteredRentCars(searchDto);
+    private List<RentCar> search(@RequestParam String vehicleType,
+                                 @RequestParam LocalDate startDate,
+                                 @RequestParam LocalDate endDate){ // 필터, 대여기간 설정 후 검색
+        SearchDto dto=SearchDto.builder().startDate(startDate)
+                                        .endDate(endDate)
+                                        .vehicleType(vehicleType).build();
+
+        return rentCarService.searchFullFilteredRentCars(dto);
     }
     @PostMapping("/rent/return") // 검증 완료
-    private String delete(@RequestParam String licensePlateNum, HttpSession session){ // 반납
-        if(!rentCarService.carReturn(licensePlateNum,(String)session.getAttribute("cno")))
-            return licensePlateNum+" : error in returnCar";
+    private String delete(@RequestParam String licensePlateNo, HttpSession session){ // 반납
+        String[] license=licensePlateNo.split("/");
+
+        if(!rentCarService.carReturn(license[0],(String)session.getAttribute("cno")))
+            return licensePlateNo+" : error in returnCar";
         else
-            return licensePlateNum + " is deleted at rentalList";
+            return licensePlateNo + " is deleted at rentalList";
     }
 }

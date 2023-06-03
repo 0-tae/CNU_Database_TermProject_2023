@@ -35,8 +35,7 @@ public class PreviousRentalService {
     public List<ResponseDtoForPreviousRental> convertPreviousRentalToDto(String cno){
         return findAllByCno(cno).stream().
                 map(rental->ResponseDtoForPreviousRental.builder()
-                        .licensePlateNum(rental.getLicensePlateNo())
-                        .modelName(entityManager.find(RentCar.class,rental.getLicensePlateNo()).getCarModel().getModelName())
+                        .rentCar(rental.getRentCar())
                         .dateRented(rental.getDateRented())
                         .dateReturned(rental.getDateReturned())
                         .payment(rental.getPayment()).build()).sorted((o1, o2) -> o1.getDateRented().compareTo(o2.getDateRented())).toList();

@@ -1,23 +1,18 @@
 package cnu2023.cnu_database_termproject_2023.previousrental;
 
+import cnu2023.cnu_database_termproject_2023.rentcar.RentCar;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Getter
+@AllArgsConstructor
+@Builder
 public class ResponseDtoForPreviousRental {
-    String modelName;
-    String licensePlateNum;
+    RentCar rentCar;
     LocalDate dateRented;
     LocalDate dateReturned;
     Integer payment;
-    @Builder
-    public ResponseDtoForPreviousRental(String modelName, String licensePlateNum, LocalDate dateRented, LocalDate dateReturned, Integer payment) {
-        this.modelName = modelName;
-        this.licensePlateNum = licensePlateNum;
-        this.dateRented = dateRented;
-        this.dateReturned = dateReturned;
-        this.payment = payment;
-    }
 }

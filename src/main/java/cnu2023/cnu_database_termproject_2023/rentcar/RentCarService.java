@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,25 @@ public class RentCarService {
         this.entityManager = entityManager;
     }
 
+
+    @Transactional
+    public void saveAll(String cno){
+        List<Reserve> reservations = reserveService.findReserveAllByCno(cno);
+        // 현재 cno에 대한 reservations 확인
+
+        reservations.stream().filter(reserve -> reserve.getStartDate().isEqual(LocalDate.now()))
+                .forEach(reserve -> {
+                    RentCar rentCar=reserve.getRentCar();
+
+                    entityManager.detach(rentCar);
+                    rentCar.setCustomer(reserve.getCustomer());
+                    rentCar.setDateRented(reserve.getStartDate());
+                    rentCar.setDateDue(reserve.getEndDate());
+
+                    RentCar merged=entityManager.merge(rentCar);
+                    entityManager.persist(merged);});
+    }
+
     public List<RentCar> searchFullFilteredRentCars(SearchDto searchDto){
         List<RentCar> availableList=findAvailableRentCars(searchDto);
         List<RentCar> filteredList;
@@ -36,7 +56,7 @@ public class RentCarService {
         filteredList=availableList.stream().filter(rentCar->{
             Reserve reserve=reserveService.findReserveByLicence(rentCar.getLicensePlateNo(),rentCar.getDateRented());
             return reserve==null || !(reserveService.isReserveTimeConflict(reserve,searchDto.startDate)
-                    && reserveService.isReserveTimeConflict(reserve,searchDto.endDate));
+                    || reserveService.isReserveTimeConflict(reserve,searchDto.endDate));
         }).collect(Collectors.toList());
 
         return filteredList;
@@ -47,8 +67,8 @@ public class RentCarService {
         List<RentCar> filteredList;
 
         filteredList=entierList.stream().filter(rentCar->
-                searchDto.vehicleType.equals("entire") || rentCar.getCarModel().getVehicleType().equals(searchDto.vehicleType)
-                &&!(isRentalTimeConflict(rentCar,searchDto.startDate) && isRentalTimeConflict(rentCar,searchDto.endDate)))
+                (searchDto.vehicleType.equals("entire") || rentCar.getCarModel().getVehicleType().equals(searchDto.vehicleType))
+                &&!(isRentalTimeConflict(rentCar,searchDto.startDate) || isRentalTimeConflict(rentCar,searchDto.endDate)))
                 .collect(Collectors.toList());
 
         return filteredList;
@@ -67,23 +87,26 @@ public class RentCarService {
         if(existRental.getDateRented()==null || existRental.getDateDue()==null)
             return false; // 대여중이지 않은 것
 
-        return existRental.getDateRented().isAfter(inputDateTime) &&
-                existRental.getDateDue().isBefore(inputDateTime);
+        return (existRental.getDateRented().isAfter(inputDateTime) &&
+                existRental.getDateDue().isBefore(inputDateTime)) ||
+                (existRental.getDateRented().isEqual(inputDateTime)
+                || existRental.getDateDue().isEqual(inputDateTime));
     }
 
     public int paymentCalculation(RentCar rentCar, int totalDay){
         return rentCar.getCarModel().getRentRatePerDay()*totalDay;
     }
     public PreviousRentalDto createPreviousRentalData(RentCar rentCar){
-        LocalDate returnDate=LocalDate.now();
-        int perDay=(int)rentCar.getDateRented().until(returnDate, ChronoUnit.DAYS);
+        // LocalDate returnDate1=LocalDate.now();
+        LocalDate returnDate2=rentCar.getDateDue();
+        int perDay=(int)rentCar.getDateRented().until(returnDate2, ChronoUnit.DAYS);
         int payment=paymentCalculation(rentCar,perDay);
 
         return PreviousRentalDto.builder().
-                licensePlateNo(rentCar.getLicensePlateNo()).
+                rentCar(rentCar).
                 dateRented(rentCar.getDateRented()).
                 customer(rentCar.getCustomer()).
-                dateReturned(returnDate).
+                dateReturned(returnDate2).
                 payment(perDay*payment).build();
     }
     @Transactional

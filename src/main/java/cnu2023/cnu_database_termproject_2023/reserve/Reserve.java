@@ -2,11 +2,11 @@ package cnu2023.cnu_database_termproject_2023.reserve;
 
 import cnu2023.cnu_database_termproject_2023.customer.Customer;
 import cnu2023.cnu_database_termproject_2023.previousrental.PreviousRentalPK;
+import cnu2023.cnu_database_termproject_2023.rentcar.RentCar;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -14,21 +14,16 @@ import java.time.LocalDate;
 @Table(name = "RESERVE")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @IdClass(ReservePK.class)
 @ToString
 public class Reserve {
-    @Builder
-    public Reserve(String licensePlateNo, LocalDate startDate, LocalDate reserveDate, LocalDate endDate, Customer cno) {
-        this.licensePlateNo = licensePlateNo;
-        this.startDate = startDate;
-        this.reserveDate = reserveDate;
-        this.endDate = endDate;
-        this.customer = cno;
-    }
 
     @Id
-    @Column(name = "LICENSEPLATENO")
-    private String licensePlateNo;
+    @ManyToOne(targetEntity = RentCar.class, fetch = FetchType.EAGER) // 헷갈려
+    @JoinColumn(name = "LICENSEPLATENO")
+    private RentCar rentCar;
 
     @Id
     @Column(name = "STARTDATE")

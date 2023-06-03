@@ -2,6 +2,7 @@ package cnu2023.cnu_database_termproject_2023.reserve;
 
 
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,17 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class ReserveController {
     private final ReserveService reserveService;
 
     public ReserveController(ReserveService reserveService) {
         this.reserveService = reserveService;
     }
-//
-//    @GetMapping("reserve/read")
-//    private Reserve read(String cno){
-//        return reserveService.findReserveByCno(cno);
-//    }
 
     @GetMapping("/reserve/readAll") // 검증완료
     private List<Reserve> readAll(HttpSession session){ // load All by cno
@@ -36,7 +33,6 @@ public class ReserveController {
 
     @PostMapping("/reserve/cancel")
     private String cancel(@RequestBody ReserveDto reserveDto){
-
         if(!reserveService.cancelReserve(reserveDto.getLicensePlateNo(),reserveDto.getStartDate()))
             return "cancel error : "+reserveDto.getLicensePlateNo();
         else
