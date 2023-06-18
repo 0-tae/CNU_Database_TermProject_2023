@@ -28,11 +28,4 @@ public class Customer {
 
     @Column(name = "EMAIL")
     private String email;
-
-    @Column(name="IS_RENTING")
-    private int is_renting;
-
-    public void setRenting(int rent){
-        is_renting=rent;
-    }
 }

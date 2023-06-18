@@ -18,18 +18,16 @@ import java.util.List;
 @Service
 @Slf4j
 public class TotalService {
-    private final EntityManager entityManager;
     private final DataSource dataSource;
     private Connection connection;
 
-    public TotalService(EntityManager entityManager, DataSource dataSource) throws SQLException {
-        this.entityManager = entityManager;
+    public TotalService(DataSource dataSource) throws SQLException {
         this.dataSource = dataSource;
-        connection=dataSource.getConnection();
+        connection=dataSource.getConnection(); // DataSource에 기반한 연결정보 생성
     }
 
     public List<CarModelPerRentalDto> getCarModelPerRentalList() throws SQLException {
-        List<CarModelPerRentalDto> result=new ArrayList<>();
+        List<CarModelPerRentalDto> result=new ArrayList<>(); // 정보 반환 배열
 
         String sqlQuery = "SELECT r.MODELNAME AS MODELNAME, " +
                 "count(*) AS RENTALCOUNT, " +
@@ -37,23 +35,23 @@ public class TotalService {
                 "FROM RENTCAR r " +
                 "INNER JOIN PREVIOUSRENTAL p " +
                 "ON r.LICENSEPLATENO = p.LICENSEPLATENO " +
-                "GROUP BY r.MODELNAME";
+                "GROUP BY r.MODELNAME"; // 쿼리 스트링
 
-        PreparedStatement statement=connection.prepareStatement(sqlQuery);
-        ResultSet resultSet=statement.executeQuery();
+        PreparedStatement statement=connection.prepareStatement(sqlQuery); // JDPC Statement에 쿼리 삽입
+        ResultSet resultSet=statement.executeQuery(); // 쿼리 실행
 
-        while(resultSet.next()){
+        while(resultSet.next()){ // cursor를 통해 결과 가져옴
             CarModelPerRentalDto dto=
                     CarModelPerRentalDto.builder().
                             PAYMENTS(resultSet.getString("PAYMENTS")).
                             RENTALCOUNT(resultSet.getInt("RENTALCOUNT")).
                             MODELNAME(resultSet.getString("MODELNAME")).build();
+            // 각 컬럼명을 가져와서 엔티티로 빌드
 
-            log.info("{}",dto);
-            result.add(dto);
+            result.add(dto); // 정보 반환 배열에 저장
         }
 
-        return result;
+        return result; // 정보 반환
     }
 
     public List<PaymentAndRentalPerYearDto> getPaymentAndRentalPerYearList(int year, String modelName) throws SQLException {
@@ -86,12 +84,13 @@ public class TotalService {
                             TOTAL_Payment(resultSet.getString("TOTAL_Payment")).
                             CAR(resultSet.getString("car")).
                             RENTDATE(resultSet.getString("rentdate")).build();
-            log.info("{}",dto);
             result.add(dto);
         }
 
+
+
         return result;
-    }
+    } // 이하 동문
 
     public List<VIPCustomerDto> getVIPCustomerList() throws SQLException {
         List<VIPCustomerDto> result=new ArrayList<>();
@@ -117,5 +116,5 @@ public class TotalService {
         }
 
         return result;
-    }
+    } // 이하 동문
 }

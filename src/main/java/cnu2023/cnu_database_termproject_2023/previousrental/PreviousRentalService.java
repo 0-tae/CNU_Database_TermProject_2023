@@ -10,29 +10,25 @@ import java.util.stream.Collectors;
 
 @Service
 public class PreviousRentalService {
-
-    private final EntityManager entityManager;
-
     private final PreviousRentalRepository previousRentalRepository;
 
-    public PreviousRentalService(EntityManager entityManager, PreviousRentalRepository previousRentalRepository) {
-        this.entityManager = entityManager;
+    public PreviousRentalService(PreviousRentalRepository previousRentalRepository) {
         this.previousRentalRepository = previousRentalRepository;
     }
 
-    public PreviousRental save(PreviousRentalDto dto){
+    public PreviousRental save(PreviousRentalDto dto){ // 이전 대여 내역 저장
         PreviousRental previousRental= dto.toEntity();
         return previousRentalRepository.save(previousRental);
     }
 
-    public List<PreviousRental> findAllByCno(String cno){
+    public List<PreviousRental> findAllByCno(String cno){ // 고객의 이전 대여내역 찾기
         return previousRentalRepository.findAll().stream().
                 filter(rental->rental.getCustomer().getCno().equals(cno)).
                 collect(Collectors.toList());
     }
 
 
-    public List<ResponseDtoForPreviousRental> convertPreviousRentalToDto(String cno){
+    public List<ResponseDtoForPreviousRental> convertPreviousRentalToDto(String cno){ // 엔터티를 반환 객체로 변환
         return findAllByCno(cno).stream().
                 map(rental->ResponseDtoForPreviousRental.builder()
                         .rentCar(rental.getRentCar())

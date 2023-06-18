@@ -19,7 +19,7 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @PostMapping("/main/login") // 검증완료
+    @PostMapping("/main/login") // 로그인 요청 처리
     private String login(@RequestBody CustomerDto dto, HttpSession session){
         Customer customer=customerService.findCustomer(dto.cno);
 
@@ -31,18 +31,19 @@ public class CustomerController {
         session.setAttribute("cno",getCno);
         log.info((String)session.getAttribute("cno"));
         return getCno+", session id: "+session.getId();
-    } // 로그인 하면 유저 아이디를 얻어올 수 있다. session-check을 통해서만 아이디를 얻어오자.
-    @PostMapping("main/register") // 검증완료
+    } // 로그인 하면 세션에 유저 아이디를 넣어 세션으로 유저 정보를 체크할 수 있다.
+
+    @PostMapping("main/register") // 회원가입
     private String register(@RequestParam Map<String,String> params) {
-        Customer customer=customerService.saveCustomer(params);
+        Customer customer=customerService.saveCustomer(params); // 데이터 베이스 저장
         return "Success: " + customer.getName();
     }
 
-    @PostMapping("session_check") // 검증완료
+    @PostMapping("session_check") // 세션 체크
     private CustomerSessionDto session_check(HttpSession session){
         return  CustomerSessionDto.builder().
                 cno((String)session.getAttribute("cno")).
-                sessionId(session.getId()).build();
+                sessionId(session.getId()).build(); // 고객의 정보를 넘겨준다.
     }
 
     @PostMapping("/session_destroy")
@@ -50,7 +51,7 @@ public class CustomerController {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
-            session.invalidate();
+            session.invalidate(); // 로그아웃시, 세션 삭제
         }
 
         return "session_destroyed";

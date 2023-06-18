@@ -20,16 +20,16 @@ public class TotalController {
 
     @GetMapping("/total/CarModelPerRental")
     private List<CarModelPerRentalDto> readCarModelPerRentalList() throws SQLException {
-        return totalService.getCarModelPerRentalList();
+        return totalService.getCarModelPerRentalList(); // 요청에 대해 통계정보 출력
     }
 
     @GetMapping("/total/PaymentAndRentalPerYear")
     private List<PaymentAndRentalPerYearDto> readPaymentAndRentalPerYearList(@RequestParam int year,
                                                                        @RequestParam String modelName) throws SQLException {
-        return totalService.getPaymentAndRentalPerYearList(year,modelName);
+        return totalService.getPaymentAndRentalPerYearList(year,modelName);  // 요청에 대해 통계정보 출력
     }
     @GetMapping("/total/VIPCustomer")
     private List<VIPCustomerDto> readVIPCustomerList() throws SQLException {
-        return totalService.getVIPCustomerList();
+        return totalService.getVIPCustomerList();  // 요청에 대해 통계정보 출력
     }
 }

@@ -56,7 +56,7 @@ function login(){
         },
         success: function(data){
             username=request["cno"];
-            session_check();
+            session_check(); // 로그인 이후 세션 체크
         }
     });
 }
@@ -66,7 +66,7 @@ function search(){
     check_boxes.forEach(function (box){
         if(check_boxes[0].checked && box.name!=="entire"){
             return;
-        } else if(box.checked){
+        } else if(box.checked){ //
             let request={};
             let date=new Date();
             let today = date.getFullYear()+"-"+
@@ -118,11 +118,6 @@ function reserve(e){
         data: JSON.stringify(request),
         async : true,
         success: function(data){
-            if(data.length<1){
-                alert("현재 예약 하려는 날짜가 기존 대여 기간과 중복 됩니다.");
-                return;
-            }
-
             let givenData=JSON.parse(data);
             print_reservationList(givenData);
             e.target.removeEventListener("click",reserve);

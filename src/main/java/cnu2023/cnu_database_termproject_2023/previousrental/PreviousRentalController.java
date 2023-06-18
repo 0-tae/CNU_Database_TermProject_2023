@@ -16,7 +16,7 @@ public class PreviousRentalController {
         this.previousRentalService = previousRentalService;
     }
 
-    @GetMapping("/previous/readAll") // 검증완료
+    @GetMapping("/previous/readAll") // 이전 대여 내역 출력
     public List<ResponseDtoForPreviousRental> readAll(HttpSession session){ // 이전 대여 내역 출력(고객 기준)
         return previousRentalService.convertPreviousRentalToDto((String) session.getAttribute("cno"));
     }
