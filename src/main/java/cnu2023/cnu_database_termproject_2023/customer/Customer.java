@@ -10,17 +10,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "CUSTOMER")
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @ToString
+@AllArgsConstructor
 public class Customer {
-
-    @Builder
-    public Customer(String cno, String name, String passwd, String email) {
-        this.cno = cno;
-        this.name = name;
-        this.passwd = passwd;
-        this.email = email;
-    }
 
     @Id
     @Column(name = "CNO")
@@ -34,4 +28,11 @@ public class Customer {
 
     @Column(name = "EMAIL")
     private String email;
+
+    @Column(name="IS_RENTING")
+    private int is_renting;
+
+    public void setRenting(int rent){
+        is_renting=rent;
+    }
 }

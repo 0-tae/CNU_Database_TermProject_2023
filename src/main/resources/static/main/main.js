@@ -3,15 +3,17 @@ const popup_form = document.getElementById("popup_background");
 const register_button =document.getElementById("button_register");
 const login_button =document.getElementById("button_login");
 const cancle_button=document.getElementById("button_cancle");
-const button_session=document.getElementById("button_session");
 const login_zone=document.getElementById("zone_login");
 const box_printZone=document.getElementById("box_printZone");
 const box_reserveZone=document.getElementById("box_reserveZone");
 const box_returnZone=document.getElementById("box_returnZone");
 const box_previousRentZone=document.getElementById("box_previousRentZone");
-const box_currentRentZone=document.getElementById("box_currentRentZone");
 const box_tmiZone=document.getElementById("box_tmiZone");
 const button_search=document.getElementById("button_search");
+const button_previous =document.getElementById("button_previous");
+const button_info1=document.getElementById("button_info1");
+const button_info2=document.getElementById("button_info2");
+const button_info3=document.getElementById("button_info3");
 
 
 let check_entire=document.getElementById("entire");
@@ -22,7 +24,6 @@ let check_suv=document.getElementById("suv");
 let check_hop=document.getElementById("hop");
 let date_rentStart=document.getElementById("date_rentStart")
 let date_rentEnd=document.getElementById("date_rentEnd")
-
 
 let check_boxes=[check_entire,
                                 check_small,check_huge,
@@ -67,9 +68,21 @@ function search(){
             return;
         } else if(box.checked){
             let request={};
+            let date=new Date();
+            let today = date.getFullYear()+"-"+
+                String(date.getMonth()+1).padStart(2,"0")+"-"
+                + String(date.getDate()).padStart(2,"0");
+
             request["startDate"]=date_rentStart.value
             request["endDate"]=date_rentEnd.value
             request["vehicleType"]=box.name
+
+            if(request["startDate"]<today
+            || request["endDate"]<today
+            || request["startDate"]>request["endDate"]){
+                alert("시간 설정을 확인해 주세요.")
+                return;
+            }
 
             $.ajax({
                 url: "/rent/search",
@@ -105,6 +118,11 @@ function reserve(e){
         data: JSON.stringify(request),
         async : true,
         success: function(data){
+            if(data.length<1){
+                alert("현재 예약 하려는 날짜가 기존 대여 기간과 중복 됩니다.");
+                return;
+            }
+
             let givenData=JSON.parse(data);
             print_reservationList(givenData);
             e.target.removeEventListener("click",reserve);
@@ -173,7 +191,7 @@ function print_rentalList(rentalJSON){
                 <p>반납 예정일: ${rentalJSON.dateDue}</p>
                 <p>예상 결제 금액: ${rentalJSON.expectedPayment}</p>
                 <p>옵션: ...</p>
-                <button id="${rentalJSON.rentCar.licensePlateNo}/Rent" startDate=${rentalJSON.startDate} endDate=${rentalJSON.endDate}>반납 및 결제하기</button>
+                <button id="${rentalJSON.licensePlateNo}/Rent" startDate=${rentalJSON.startDate} endDate=${rentalJSON.endDate}>반납 및 결제하기</button>
             </span>`
     );
     box_returnZone.appendChild(myElement[0]);
@@ -182,32 +200,43 @@ function print_rentalList(rentalJSON){
 }
 
 function update_previousRentalList(e){
-    let request={};
-    request["licensePlateNo"]=e.id;
-
     $.ajax({
         url: "/rent/return",
         type: 'POST',
         dataType: 'text', // 돌려받을 타입, text로 받으면 JSON.parse로 해결한다.
-        contentType: "application/json", // 전해줄 타입
-        data: JSON.stringify(request),
+        data: e.target.id,
         async : true,
         success: function(data){
+            console.log(data);
             e.target.removeEventListener("click",update_previousRentalList);
             box_returnZone.removeChild(e.target.parentNode);
         }
     });
 }
 
+function print_previousRentalList(previousJSON){
+    const myElement = $(
+        `<span style="display: inline-block; border: 1px solid black; margin: 5px">
+                <p>차량번호: ${previousJSON.rentCar.licensePlateNo}</p>
+                <p>모델명: ${previousJSON.rentCar.carModel.modelName}</p>
+                <p>차종: ${previousJSON.rentCar.carModel.vehicleType}</p>
+                <p>대여 기간 : ${previousJSON.dateRented} ~ ${previousJSON.dateReturned}</p>
+                <p>결제 금액: ${previousJSON.payment}</p>
+        </span>`
+    );
+    box_previousRentZone.appendChild(myElement[0]);
+}
 function print_previousRentalListAll(){
     $.ajax({
         url: "/previous/readAll",
-        type: 'POST',
+        type: 'GET',
         dataType: 'text', // 돌려받을 타입, text로 받으면 JSON.parse로 해결한다.
         contentType: "application/json", // 전해줄 타입
         async : true,
-        success: function(){
-            console.log("RentalList Updated");
+        success: function(data){
+            box_previousRentZone.innerHTML="";
+            const dataArray=JSON.parse(data);
+            dataArray.forEach(data => print_previousRentalList(data));
         }
     });
 }
@@ -241,7 +270,7 @@ function print_reservationList(reservationJSON){
             </span>`
         );
         box_reserveZone.appendChild(myElement[0]);
-        document.getElementById(reservationJSON.licensePlateNo+"/R")
+        document.getElementById(reservationJSON.rentCar.licensePlateNo+"/R")
         .addEventListener("click",cancel);
 }
 
@@ -264,6 +293,135 @@ function print_availableRentCar(rentCarsJSON,startDate,endDate){
         addedButton.addEventListener("click",reserve);
     });
 }
+
+function info(e){
+    let infoType=e.target.getAttribute("infoType");
+    let url;
+    switch (parseInt(infoType)){
+        case 1:
+            url="/total/CarModelPerRental";
+            break;
+        case 2:
+            let input_year=document.getElementById("input_year");
+            let input_modelName=document.getElementById("input_modelName");
+            url=`/total/PaymentAndRentalPerYear?year=${input_year.value}&&modelName=${input_modelName.value}`;
+            break;
+        case 3:
+            url="/total/VIPCustomer";
+            break;
+    }
+
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'text', // 돌려받을 타입, text로 받으면 JSON.parse로 해결한다.
+        contentType: "application/json", // 전해줄 타입
+        async : true,
+        success: function(data){
+            const dataArray=JSON.parse(data);
+            switch (parseInt(infoType)){
+                case 1:
+                    print_info1(dataArray)
+                    break;
+                case 2:
+                    print_info2(dataArray)
+                    break;
+                case 3:
+                    print_info3(dataArray)
+                    break;
+            }
+        }
+    });
+}
+
+function print_info1(infoJSONArray){
+    box_tmiZone.innerHTML = "";
+    const tableTitle = $(`
+        <tr>
+            <th>모델명</th>
+            <th>대여 횟수</th>
+            <th>총 매출액</th>
+        </tr>
+    `);
+    box_tmiZone.appendChild(tableTitle[0]);
+    infoJSONArray.forEach(info => {
+        console.log(info);
+
+        const myElement = $(
+        `<tr>
+            <td>${info.modelname}</td>
+            <td>${info.rentalcount}</td>
+            <td>${info.payments}</td>
+        </tr>`
+        );
+        box_tmiZone.appendChild(myElement[0]);
+    });
+}
+
+function print_info2(infoJSONArray){
+    box_tmiZone.innerHTML = "";
+    const tableTitle = $(`
+        <tr>
+            <th>모델명</th>
+            <th>대상 월</th>
+            <th>빌린 횟수</th>
+            <th>매출액</th>
+        </tr>
+    `);
+    box_tmiZone.appendChild(tableTitle[0]);
+    infoJSONArray.forEach(info => {
+        console.log(info);
+
+        const myElement = $(
+            `<tr>
+            <td>${info.car}</td>
+            <td>${info.rentdate}</td>
+            <td>${info.total_Rentaled}</td>
+            <td>${info.total_Payment}</td>
+        </tr>`
+        );
+        box_tmiZone.appendChild(myElement[0]);
+    });
+}
+
+function print_info3(infoJSONArray){
+    box_tmiZone.innerHTML = "";
+    const tableTitle = $(`
+        <tr>
+            <th>고객명</th>
+            <th>총 사용 금액</th>
+            <th>순위</th>
+        </tr>
+    `);
+    box_tmiZone.appendChild(tableTitle[0]);
+    infoJSONArray.forEach(info => {
+        console.log(info);
+        const myElement = $(
+            `<tr >
+            <td>${info.cno}</td>
+            <td>${info.total_Payment}</td>
+            <td>${info.rank}</td>
+        </tr>`
+        );
+        box_tmiZone.appendChild(myElement[0]);
+    });
+}
+
+function logout(){
+    $.ajax({
+        url: "/session_destroy",
+        type: 'POST',
+        async : true,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        success: function(session){
+            console.log(session)
+            location.reload();
+        }
+    });
+}
+
 function session_check(event){
     $.ajax({
         url: "/session_check",
@@ -275,7 +433,14 @@ function session_check(event){
         success: function(session){
             console.log(session)
             if(session.cno!==null) {
-                login_zone.innerHTML = "로그인 정보: " + session.cno + ", sessionId: " + session.sessionId;
+                login_zone.innerHTML = "";
+                const content = $(`<p>로그인 정보: ${session.cno}, sessionId: ${session.sessionId}</p>`);
+                const button = $(`<button id="logout_button">로그아웃</button>`);
+
+                login_zone.appendChild(content[0]);
+                login_zone.appendChild(button[0]);
+                document.getElementById("logout_button").addEventListener("click", logout);
+
                 username = session.cno;
                 return true;
             }
@@ -286,15 +451,18 @@ function session_check(event){
 }
 
 function load(){
-    if(session_check()) {
-        print_reservationListAll();
-        update_RentalList();
-        print_rentalListAll();
-    }
+    session_check();
+    print_reservationListAll();
+    update_RentalList();
+    print_rentalListAll();
 }
 
 login_button.addEventListener("click", login);
 register_button.addEventListener("click", register_popup);
 cancle_button.addEventListener("click",register_exit);
 button_search.addEventListener("click",search);
+button_previous.addEventListener("click",print_previousRentalListAll);
 document.addEventListener("DOMContentLoaded", load);
+button_info1.addEventListener("click",info);
+button_info2.addEventListener("click",info);
+button_info3.addEventListener("click",info);

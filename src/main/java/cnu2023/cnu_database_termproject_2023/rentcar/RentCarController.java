@@ -22,7 +22,7 @@ public class RentCarController {
     @GetMapping("/rent/readAll") // 검증완료
     private List<ResponseDtoForRentalInfo> readAll(HttpSession session){ // 대여내역 검색
         List<RentCar> rentalList = rentCarService.findRentCarsAllByCno((String) session.getAttribute("cno"));
-
+        log.info("{}",rentalList);
         return  rentalList.stream().map(rentcar -> ResponseDtoForRentalInfo.builder()
                 .licensePlateNo(rentcar.getLicensePlateNo())
                 .modelName(rentcar.getCarModel().getModelName())
@@ -34,9 +34,11 @@ public class RentCarController {
     }
 
     @PostMapping("/rent/save")
-    @Scheduled(cron = "0 0 0 * * *")
-    private void rent(HttpSession session){
-        rentCarService.saveAll((String) session.getAttribute("cno"));
+    @Scheduled(fixedDelay = 10000)
+//    @Scheduled(cron = "0 0 0 * * *")
+    private void rent() {
+        log.info("Start Rent: "+LocalDate.now());
+        rentCarService.switchReservationToRent(LocalDate.now());
     }
 
     @GetMapping("/rent/search")
@@ -50,12 +52,13 @@ public class RentCarController {
         return rentCarService.searchFullFilteredRentCars(dto);
     }
     @PostMapping("/rent/return") // 검증 완료
-    private String delete(@RequestParam String licensePlateNo, HttpSession session){ // 반납
-        String[] license=licensePlateNo.split("/");
+    private String delete(@RequestBody String licensePlateNo, HttpSession session){ // 반납
+        String[] license=licensePlateNo.split("%");
+        log.info("My name {}",licensePlateNo);
 
         if(!rentCarService.carReturn(license[0],(String)session.getAttribute("cno")))
-            return licensePlateNo+" : error in returnCar";
+            return license[0]+" : error in returnCar";
         else
-            return licensePlateNo + " is deleted at rentalList";
+            return license[0] + " is deleted at rentalList";
     }
 }

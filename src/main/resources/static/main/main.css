@@ -124,3 +124,8 @@ table {
     border-collapse: collapse;
     table-layout: fixed;
 }
+
+td, tr{
+    border: 1px solid black;
+
+}

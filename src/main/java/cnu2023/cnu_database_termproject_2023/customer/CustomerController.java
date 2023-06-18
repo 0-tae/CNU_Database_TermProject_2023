@@ -1,11 +1,13 @@
 package cnu2023.cnu_database_termproject_2023.customer;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.http.HttpRequest;
 import java.util.Map;
 
 @RestController
@@ -41,5 +43,16 @@ public class CustomerController {
         return  CustomerSessionDto.builder().
                 cno((String)session.getAttribute("cno")).
                 sessionId(session.getId()).build();
+    }
+
+    @PostMapping("/session_destroy")
+    private String session_destroy(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "session_destroyed";
     }
 }

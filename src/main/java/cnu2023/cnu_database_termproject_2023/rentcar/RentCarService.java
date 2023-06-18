@@ -1,5 +1,8 @@
 package cnu2023.cnu_database_termproject_2023.rentcar;
 
+import cnu2023.cnu_database_termproject_2023.customer.Customer;
+import cnu2023.cnu_database_termproject_2023.mail.MailService;
+import cnu2023.cnu_database_termproject_2023.previousrental.PreviousRental;
 import cnu2023.cnu_database_termproject_2023.previousrental.PreviousRentalDto;
 import cnu2023.cnu_database_termproject_2023.previousrental.PreviousRentalService;
 import cnu2023.cnu_database_termproject_2023.reserve.Reserve;
@@ -10,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,32 +24,34 @@ public class RentCarService {
     private final ReserveService reserveService;
     private final PreviousRentalService previousRentalService;
     private final EntityManager entityManager;
+    private final MailService mailService;
 
-
-    public RentCarService(RentCarRepository rentCarRepository, ReserveService reserveService, PreviousRentalService previousRentalService, EntityManager entityManager) {
+    public RentCarService(RentCarRepository rentCarRepository, ReserveService reserveService, PreviousRentalService previousRentalService, EntityManager entityManager, MailService mailService) {
         this.rentCarRepository = rentCarRepository;
         this.reserveService = reserveService;
         this.previousRentalService = previousRentalService;
         this.entityManager = entityManager;
+        this.mailService = mailService;
     }
 
-
     @Transactional
-    public void saveAll(String cno){
-        List<Reserve> reservations = reserveService.findReserveAllByCno(cno);
-        // 현재 cno에 대한 reservations 확인
+    public void switchReservationToRent(LocalDate today){
+        reserveService.getReservationList(today).forEach(reserve->{
+            RentCar rentCar= rentCarRepository.findById(reserve.getRentCar().getLicensePlateNo()).get();
+            Customer customer=reserve.getCustomer();
 
-        reservations.stream().filter(reserve -> reserve.getStartDate().isEqual(LocalDate.now()))
-                .forEach(reserve -> {
-                    RentCar rentCar=reserve.getRentCar();
+            customer.setRenting(1);
 
-                    entityManager.detach(rentCar);
-                    rentCar.setCustomer(reserve.getCustomer());
-                    rentCar.setDateRented(reserve.getStartDate());
-                    rentCar.setDateDue(reserve.getEndDate());
+            rentCar.setCustomer(reserve.getCustomer());
+            rentCar.setDateRented(reserve.getStartDate());
+            rentCar.setDateDue(reserve.getEndDate());
+            entityManager.persist(rentCar);
+            entityManager.persist(customer);
 
-                    RentCar merged=entityManager.merge(rentCar);
-                    entityManager.persist(merged);});
+            reserveService.cancelReserve(rentCar.getLicensePlateNo(),reserve.getStartDate());
+        });
+
+
     }
 
     public List<RentCar> searchFullFilteredRentCars(SearchDto searchDto){
@@ -83,7 +88,7 @@ public class RentCarService {
                 filter(car->car.getCustomer().getCno().equals(cno)).toList();
     }
 
-    private boolean isRentalTimeConflict(RentCar existRental, LocalDate inputDateTime){
+    public boolean isRentalTimeConflict(RentCar existRental, LocalDate inputDateTime){
         if(existRental.getDateRented()==null || existRental.getDateDue()==null)
             return false; // 대여중이지 않은 것
 
@@ -94,7 +99,7 @@ public class RentCarService {
     }
 
     public int paymentCalculation(RentCar rentCar, int totalDay){
-        return rentCar.getCarModel().getRentRatePerDay()*totalDay;
+        return rentCar.getCarModel().getRentRatePerDay()*(totalDay+1);
     }
     public PreviousRentalDto createPreviousRentalData(RentCar rentCar){
         // LocalDate returnDate1=LocalDate.now();
@@ -115,8 +120,18 @@ public class RentCarService {
 
         if(rentCar==null || !rentCar.getCustomer().getCno().equals(cno)) return false;
 
-        previousRentalService.save(createPreviousRentalData(rentCar));
-        // 렌트카 정보 초기화 이전에 이전 대여정보를 생성
+        PreviousRental previousRental=previousRentalService.save(createPreviousRentalData(rentCar));
+
+        try {
+            Thread mailSendingThread = new Thread(() -> mailService.sendMail(previousRental));
+            mailSendingThread.start();
+        }catch (IllegalThreadStateException e){
+            System.out.println("MAIL 전송 실패");
+        }
+        // 렌트카 정보 초기화 이전에 이전 대여정보를 생성 후 메일통보
+        Customer customer = rentCar.getCustomer();
+        customer.setRenting(0);
+        entityManager.persist(customer);
 
         rentCar.setCustomer(null);
         rentCar.setDateRented(null);
@@ -124,8 +139,6 @@ public class RentCarService {
         RentCar modified = entityManager.merge(rentCar);
 
         entityManager.persist(modified);
-
         return true;
     }
-
 }

@@ -1,9 +1,7 @@
 package cnu2023.cnu_database_termproject_2023.carmodel;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,7 +11,6 @@ import java.util.Locale;
 @Entity
 @Getter
 @ToString
-
 public class CarModel {
     @Id
     @Column(name = "MODELNAME")
@@ -31,3 +28,6 @@ public class CarModel {
     @Column(name = "NUMBEROFSEATS")
     private Integer numberOfSeats;
 }
+
+
+

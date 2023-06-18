@@ -3,7 +3,9 @@ package cnu2023.cnu_database_termproject_2023.reserve;
 import cnu2023.cnu_database_termproject_2023.customer.Customer;
 import cnu2023.cnu_database_termproject_2023.customer.CustomerService;
 import cnu2023.cnu_database_termproject_2023.rentcar.RentCar;
+import cnu2023.cnu_database_termproject_2023.rentcar.RentCarService;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ReserveService {
     private final ReserveRepository reserveRepository;
     private final CustomerService customerService;
@@ -37,8 +40,6 @@ public class ReserveService {
                 toList();
     }
 
-
-
     public boolean isReserveTimeConflict(Reserve existReservation,LocalDate inputDateTime){
         if(existReservation.getStartDate()==null || existReservation.getEndDate()==null)
             return false;
@@ -49,6 +50,10 @@ public class ReserveService {
                 || existReservation.getEndDate().isEqual(inputDateTime));
     }
 
+    public List<Reserve> getReservationList(LocalDate today){
+        return this.findReserveAll().stream().
+                filter(reserve -> reserve.getStartDate().isEqual(today)).toList();
+    }
 
     public boolean cancelReserve(String licensePLateNo, LocalDate dateTime){
         try{
@@ -65,7 +70,17 @@ public class ReserveService {
     public Reserve saveReserve(ReserveDto dto){
         RentCar rentCar=entityManager.find(RentCar.class,dto.getLicensePlateNo());
         Customer customer=customerService.findCustomer(dto.getCno());
+
         Reserve reserve=dto.toEntity(rentCar,customer);
+
+        List<Reserve> foundReserveList=findReserveAllByCno(dto.getCno());
+
+        boolean reservationConflict=foundReserveList.stream().anyMatch(reservation->
+                        isReserveTimeConflict(reservation, reserve.getStartDate()) ||
+                        isReserveTimeConflict(reservation, reserve.getEndDate()) ||
+                                reservation.getCustomer().getIs_renting()==1);
+
+        if(reservationConflict) return null;
 
         return reserveRepository.save(reserve);
     }
